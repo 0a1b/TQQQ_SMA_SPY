@@ -2,19 +2,24 @@ name: Daily Strategy Update
 
 on:
   schedule:
-    # Runs at 00:00 UTC every day
-    - cron: '0 0 * * *'
-  workflow_dispatch: # Allows manual triggering from the "Actions" tab
+    - cron: '0 0 * * *' # Runs at midnight UTC
+  workflow_dispatch:    # Allows manual click-to-run
 
+# Permissions needed for the bot to deploy
 permissions:
   contents: read
   pages: write
   id-token: write
 
+# Allow only one concurrent deployment (prevents clashes)
+concurrency:
+  group: "pages"
+  cancel-in-progress: true
+
 jobs:
-  build-and-deploy:
+  # JOB 1: Run Python and Build the Site
+  build:
     runs-on: ubuntu-latest
-    
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -25,8 +30,7 @@ jobs:
           python-version: '3.10'
 
       - name: Install dependencies
-        run: |
-          pip install -r requirements.txt
+        run: pip install -r requirements.txt
 
       - name: Run Strategy Script
         run: python main.py
@@ -36,6 +40,14 @@ jobs:
         with:
           path: '.'
 
+  # JOB 2: Deploy the Site (Only runs if Build succeeds)
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
