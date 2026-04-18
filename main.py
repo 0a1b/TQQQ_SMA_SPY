@@ -74,8 +74,8 @@ def calculate_signal():
         
     elif today_in_market:
         # Bullish but no change (Holding)
-        image = "hold.jpg"
-        status = "BULLISH (HOLD)"
+        image = "buy.jpg"
+        status = "BUY / HOLD"
         decision = f"HOLD {TRADE_ASSET}"
         color = "#3498db" # Blue
         message = f"Trend is healthy. Sell if SPY closes below ${sell_trigger:.2f}."
@@ -83,7 +83,7 @@ def calculate_signal():
     else:
         # Bearish but no change (Waiting)
         image = "hold.jpg"
-        status = "BEARISH (WAIT)"
+        status = "OUT OF MARKET"
         decision = "HOLD CASH"
         color = "#95a5a6" # Grey
         message = f"Trend is weak. Buy if SPY closes above ${buy_trigger:.2f}."
